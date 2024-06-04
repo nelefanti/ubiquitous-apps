@@ -3,6 +3,7 @@ package com.example.reminder;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import com.example.reminder.FeedReminder.FeedEntry;
 
 public class FeedReminderDbHelper extends SQLiteOpenHelper {
