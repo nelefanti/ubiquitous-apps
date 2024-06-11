@@ -3,12 +3,17 @@ package com.example.reminder;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,6 +58,45 @@ public class MainActivity extends AppCompatActivity {
                 reminderNote.setText("");
             }
         });
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                Reminder reminder = reminderList.get(position);
+                reminderAdapter.deleteReminder(reminder.getId());
+                reminderAdapter.removeReminderAt(position);
+            }
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = viewHolder.itemView;
+                    Paint p = new Paint();
+                    if (dX < 0) {
+                        p.setColor(Color.RED);
+                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                                (float) itemView.getRight(), (float) itemView.getBottom(), p);
+                        p.setColor(Color.WHITE);
+                        p.setTextSize(getResources().getDimensionPixelSize(R.dimen.delete_text_size));
+                        String text = "Delete";
+                        float textWidth = p.measureText(text);
+                        float textX = itemView.getRight() - textWidth - getResources().getDimensionPixelSize(R.dimen.delete_text_margin);
+                        float textY = itemView.getTop() + ((itemView.getBottom() - itemView.getTop()) / 2) + (p.getTextSize() / 2);
+                        c.drawText(text, textX, textY, p);
+                    }
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+                }
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
     }
 
     private void addNewReminder(String title, String note, boolean done, String dueDate) {
