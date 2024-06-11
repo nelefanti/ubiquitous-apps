@@ -5,27 +5,30 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/newReminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Neue Erinnerung"
-        tools:layout_editor_absoluteY="16dp" />
-
     <EditText
         android:id="@+id/reminderText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
         android:ems="10"
         android:inputType="text"
-        android:text="Titel" />
+        android:text="title" />
+
     <EditText
         android:id="@+id/reminderNote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:inputType="text"
-        android:text="Note" />
+        android:text="note" />
+
+    <Button
+        android:id="@+id/newReminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="create reminder"
+        tools:layout_editor_absoluteY="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

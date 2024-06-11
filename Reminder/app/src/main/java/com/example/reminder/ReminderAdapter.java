@@ -25,18 +25,18 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         public CheckBox checkBox;
         public TextView titleTextView;
         public TextView noteTextView;
-        public TextView doneTextView;
-        public TextView dueDateTextView;
-        public Button deleteButton;
+        //public TextView doneTextView;
+        //public TextView dueDateTextView;
+        //public Button deleteButton;
 
         public ReminderViewHolder(View view) {
             super(view);
             checkBox = view.findViewById(R.id.checkBox);
             titleTextView = view.findViewById(R.id.titleTextView);
             noteTextView = view.findViewById(R.id.noteTextView);
-            doneTextView = view.findViewById(R.id.doneTextView);
-            dueDateTextView = view.findViewById(R.id.dueDateTextView);
-            deleteButton = view.findViewById(R.id.deleteButton);
+            //doneTextView = view.findViewById(R.id.doneTextView);
+            //dueDateTextView = view.findViewById(R.id.dueDateTextView);
+            //deleteButton = view.findViewById(R.id.deleteButton);
         }
     }
 
@@ -58,29 +58,30 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         Reminder reminder = reminderList.get(position);
         holder.titleTextView.setText(reminder.getTitle());
         holder.noteTextView.setText(reminder.getNote());
-        holder.doneTextView.setText(reminder.isDone() ? "Done" : "Not Done");
-        holder.dueDateTextView.setText(reminder.getDueDate());
+        //holder.dueDateTextView.setText(reminder.getDueDate());
         holder.checkBox.setChecked(reminder.isDone());
+
+        holder.checkBox.setText(reminder.isDone() ? "done" : "not done");
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             updateReminderDoneStatus(reminder.getId(), isChecked);
-            reminder.setDone(isChecked); // Update the reminder object
-            // Post the notifyItemChanged call to the handler to ensure it executes after the current layout pass
-            handler.post(() -> notifyItemChanged(position));
+            reminder.setDone(isChecked);
+            holder.checkBox.setText(isChecked ? "done" : "not done");
         });
 
-        holder.deleteButton.setOnClickListener(v -> {
-            deleteReminder(reminder.getId());
-            removeReminderAt(position);
-        });
+        //holder.deleteButton.setOnClickListener(v -> {
+        //    deleteReminder(reminder.getId());
+        //    removeReminderAt(position);
+        //});
     }
+
 
     @Override
     public int getItemCount() {
         return reminderList.size();
     }
 
-    private void updateReminderDoneStatus(long id, boolean done) {
+    public void updateReminderDoneStatus(long id, boolean done) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(FeedReminder.FeedEntry.COLUMN_NAME_DONE, done ? 1 : 0);
@@ -89,14 +90,14 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         db.update(FeedReminder.FeedEntry.TABLE_NAME, values, selection, selectionArgs);
     }
 
-    private void deleteReminder(long id) {
+    public void deleteReminder(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = FeedReminder.FeedEntry._ID + " = ?";
         String[] selectionArgs = { String.valueOf(id) };
         db.delete(FeedReminder.FeedEntry.TABLE_NAME, selection, selectionArgs);
     }
 
-    private void removeReminderAt(int position) {
+    public void removeReminderAt(int position) {
         reminderList.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, reminderList.size());
