@@ -50,8 +50,21 @@
         app:layout_constraintTop_toBottomOf="@+id/titleTextView"
         app:layout_constraintVertical_bias="1.0" />
 
-     <!--This button needs to go! Jedes Mal, wenn ich den raus lösche, stürzt aber die ganze App ab
-      Auch wenn ich es vorher aus allen Dateien lösche-->
+    <Button
+        android:id="@+id/editBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit"
+        android:textColor="@android:color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"/>
+
+    <!--This button needs to go! Jedes Mal, wenn ich den raus lösche, stürzt aber die ganze App ab
+     Auch wenn ich es vorher aus allen Dateien lösche-->
 
     <!-- <Button
         android:id="@+id/deleteButton"

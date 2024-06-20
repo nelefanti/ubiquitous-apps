@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -20,30 +21,28 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     private List<Reminder> reminderList;
     private FeedReminderDbHelper dbHelper;
     private Handler handler;
+    private FragmentActivity activity;
 
     public static class ReminderViewHolder extends RecyclerView.ViewHolder {
         public CheckBox checkBox;
+        public Button editBtn;
         public TextView titleTextView;
         public TextView noteTextView;
-        //public TextView doneTextView;
-        //public TextView dueDateTextView;
-        //public Button deleteButton;
 
         public ReminderViewHolder(View view) {
             super(view);
             checkBox = view.findViewById(R.id.checkBox);
             titleTextView = view.findViewById(R.id.titleTextView);
             noteTextView = view.findViewById(R.id.noteTextView);
-            //doneTextView = view.findViewById(R.id.doneTextView);
-            //dueDateTextView = view.findViewById(R.id.dueDateTextView);
-            //deleteButton = view.findViewById(R.id.deleteButton);
+            editBtn = view.findViewById(R.id.editBtn);
         }
     }
 
-    public ReminderAdapter(Context context, List<Reminder> reminderList) {
+    public ReminderAdapter(FragmentActivity activity, List<Reminder> reminderList) {
         this.reminderList = reminderList;
-        this.dbHelper = new FeedReminderDbHelper(context);
+        this.dbHelper = new FeedReminderDbHelper(activity);
         this.handler = new Handler(Looper.getMainLooper());
+        this.activity = activity;
     }
 
     @Override
@@ -58,7 +57,6 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         Reminder reminder = reminderList.get(position);
         holder.titleTextView.setText(reminder.getTitle());
         holder.noteTextView.setText(reminder.getNote());
-        //holder.dueDateTextView.setText(reminder.getDueDate());
         holder.checkBox.setChecked(reminder.isDone());
 
         holder.checkBox.setText(reminder.isDone() ? "done" : "not done");
@@ -69,12 +67,11 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
             holder.checkBox.setText(isChecked ? "done" : "not done");
         });
 
-        //holder.deleteButton.setOnClickListener(v -> {
-        //    deleteReminder(reminder.getId());
-        //    removeReminderAt(position);
-        //});
+        holder.editBtn.setOnClickListener(v -> {
+            EditDialogFragment editDialogFragment = new EditDialogFragment(reminder.getId());
+            editDialogFragment.show(activity.getSupportFragmentManager(), "editDialog");
+        });
     }
-
 
     @Override
     public int getItemCount() {

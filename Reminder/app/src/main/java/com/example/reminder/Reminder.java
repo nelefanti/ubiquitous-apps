@@ -7,7 +7,7 @@ public class Reminder {
     private boolean done;
     private String dueDate;
 
-    public Reminder(long id, String title, String note, boolean done, String dueDate) {
+    public Reminder(long id, String title, String note, boolean done) {
         this.id = id;
         this.title = title;
         this.note = note;

@@ -52,14 +52,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String title = reminderText.getText().toString();
                 String note = reminderNote.getText().toString();
-                addNewReminder(title, note, false, "2024-12-31");
-                loadReminders();
-                reminderText.setText(""); // Clear the text field after adding the reminder
+                addReminder(title, note);
+                reminderText.setText("");
                 reminderNote.setText("");
+                loadReminders();
             }
         });
 
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
@@ -93,48 +93,39 @@ public class MainActivity extends AppCompatActivity {
                     super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
                 }
             }
-        });
-
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
-
     }
 
-    private void addNewReminder(String title, String note, boolean done, String dueDate) {
+    private void addReminder(String title, String note) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(FeedReminder.FeedEntry.COLUMN_NAME_TITLE, title);
         values.put(FeedReminder.FeedEntry.COLUMN_NAME_NOTE, note);
-        values.put(FeedReminder.FeedEntry.COLUMN_NAME_DONE, done ? 1 : 0);
-        values.put(FeedReminder.FeedEntry.COLUMN_NAME_DUE_DATE, dueDate);
+        values.put(FeedReminder.FeedEntry.COLUMN_NAME_DONE, 0);
         db.insert(FeedReminder.FeedEntry.TABLE_NAME, null, values);
     }
 
-    private void loadReminders() {
+    public void loadReminders() {
         reminderList.clear();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String[] projection = {
-                FeedReminder.FeedEntry._ID,
-                FeedReminder.FeedEntry.COLUMN_NAME_TITLE,
-                FeedReminder.FeedEntry.COLUMN_NAME_NOTE,
-                FeedReminder.FeedEntry.COLUMN_NAME_DONE,
-                FeedReminder.FeedEntry.COLUMN_NAME_DUE_DATE
-        };
         Cursor cursor = db.query(
                 FeedReminder.FeedEntry.TABLE_NAME,
-                projection,
+                null,
                 null,
                 null,
                 null,
                 null,
                 null
         );
+
         while (cursor.moveToNext()) {
             long id = cursor.getLong(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry._ID));
             String title = cursor.getString(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_TITLE));
             String note = cursor.getString(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_NOTE));
-            boolean done = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_DONE)) > 0;
-            String dueDate = cursor.getString(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_DUE_DATE));
-            reminderList.add(new Reminder(id, title, note, done, dueDate));
+            boolean done = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_DONE)) == 1;
+            reminderList.add(new Reminder(id, title, note, done));
         }
         cursor.close();
         reminderAdapter.notifyDataSetChanged();
