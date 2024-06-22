@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import androidx.annotation.NonNull;
@@ -29,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private EditText reminderText;
     private EditText reminderNote;
     private SwitchMaterial toggleButton;
-
+    private ImageButton addReminderButton;
+    private Button newReminderButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,23 +54,29 @@ public class MainActivity extends AppCompatActivity {
 
         reminderText = findViewById(R.id.reminderText);
         reminderNote = findViewById(R.id.reminderNote);
+        addReminderButton = findViewById(R.id.addReminderButton);
 
-        loadReminders();
-
-        Button newReminderButton = findViewById(R.id.newReminder);
-        newReminderButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String title = reminderText.getText().toString();
-                String note = reminderNote.getText().toString();
-                addReminder(title, note);
-                reminderText.setText("");
-                reminderNote.setText("");
-                loadReminders();
-            }
+        addReminderButton.setOnClickListener(v -> {
+            reminderText.setVisibility(View.VISIBLE);
+            reminderNote.setVisibility(View.VISIBLE);
+            newReminderButton.setVisibility(View.VISIBLE);
+            addReminderButton.setVisibility(View.GONE);
         });
 
+        newReminderButton = findViewById(R.id.newReminder);
 
+        newReminderButton.setOnClickListener(v -> {
+            String title = reminderText.getText().toString();
+            String note = reminderNote.getText().toString();
+            addReminder(title, note);
+            reminderText.setText("");
+            reminderNote.setText("");
+            reminderText.setVisibility(View.GONE);
+            reminderNote.setVisibility(View.GONE);
+            newReminderButton.setVisibility(View.GONE);
+            addReminderButton.setVisibility(View.VISIBLE);
+            loadReminders();
+        });
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
@@ -106,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
         itemTouchHelper.attachToRecyclerView(recyclerView);
+
+        loadReminders();
     }
 
     private void addReminder(String title, String note) {
@@ -140,5 +151,4 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
         reminderAdapter.notifyDataSetChanged();
     }
-
 }
