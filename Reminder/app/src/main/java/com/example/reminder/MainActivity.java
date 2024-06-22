@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Reminder> reminderList;
     private EditText reminderText;
     private EditText reminderNote;
+    private SwitchMaterial toggleButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,11 +38,16 @@ public class MainActivity extends AppCompatActivity {
 
         dbHelper = new FeedReminderDbHelper(this);
         recyclerView = findViewById(R.id.recyclerView);
+        toggleButton = findViewById(R.id.toggleButton);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         reminderList = new ArrayList<>();
         reminderAdapter = new ReminderAdapter(this, reminderList);
         recyclerView.setAdapter(reminderAdapter);
+
+        toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            reminderAdapter.setShowCompleted(!isChecked);
+        });
 
         reminderText = findViewById(R.id.reminderText);
         reminderNote = findViewById(R.id.reminderNote);
@@ -58,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
                 loadReminders();
             }
         });
+
+
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
             @Override
@@ -130,4 +140,5 @@ public class MainActivity extends AppCompatActivity {
         cursor.close();
         reminderAdapter.notifyDataSetChanged();
     }
+
 }

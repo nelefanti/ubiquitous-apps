@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.fragment.app.FragmentActivity;
@@ -20,12 +21,12 @@ import java.util.List;
 public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ReminderViewHolder> {
     private List<Reminder> reminderList;
     private FeedReminderDbHelper dbHelper;
-    private Handler handler;
     private FragmentActivity activity;
+    private boolean showCompleted = true;
 
     public static class ReminderViewHolder extends RecyclerView.ViewHolder {
         public CheckBox checkBox;
-        public Button editBtn;
+        public ImageButton editBtn;
         public TextView titleTextView;
         public TextView noteTextView;
 
@@ -41,8 +42,13 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     public ReminderAdapter(FragmentActivity activity, List<Reminder> reminderList) {
         this.reminderList = reminderList;
         this.dbHelper = new FeedReminderDbHelper(activity);
-        this.handler = new Handler(Looper.getMainLooper());
         this.activity = activity;
+    }
+
+    // Method to update showCompleted flag
+    public void setShowCompleted(boolean showCompleted) {
+        this.showCompleted = showCompleted;
+        notifyDataSetChanged(); // Update the RecyclerView
     }
 
     @Override
@@ -55,22 +61,30 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     @Override
     public void onBindViewHolder(ReminderViewHolder holder, int position) {
         Reminder reminder = reminderList.get(position);
-        holder.titleTextView.setText(reminder.getTitle());
-        holder.noteTextView.setText(reminder.getNote());
-        holder.checkBox.setChecked(reminder.isDone());
 
-        holder.checkBox.setText(reminder.isDone() ? "done" : "not done");
+        // Check if reminder should be shown based on showCompleted flag and completion status
+        if (!showCompleted && reminder.isDone()) {
+            holder.itemView.setVisibility(View.GONE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
+        } else {
+            holder.itemView.setVisibility(View.VISIBLE);
+            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            holder.titleTextView.setText(reminder.getTitle());
+            holder.noteTextView.setText(reminder.getNote());
+            holder.checkBox.setChecked(reminder.isDone());
 
-        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            updateReminderDoneStatus(reminder.getId(), isChecked);
-            reminder.setDone(isChecked);
-            holder.checkBox.setText(isChecked ? "done" : "not done");
-        });
+            // Handle check box change
+            holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                updateReminderDoneStatus(reminder.getId(), isChecked);
+                reminder.setDone(isChecked);
+            });
 
-        holder.editBtn.setOnClickListener(v -> {
-            EditDialogFragment editDialogFragment = new EditDialogFragment(reminder.getId());
-            editDialogFragment.show(activity.getSupportFragmentManager(), "editDialog");
-        });
+            // Handle edit button click
+            holder.editBtn.setOnClickListener(v -> {
+                EditDialogFragment editDialogFragment = new EditDialogFragment(reminder.getId());
+                editDialogFragment.show(activity.getSupportFragmentManager(), "editDialog");
+            });
+        }
     }
 
     @Override
@@ -78,6 +92,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         return reminderList.size();
     }
 
+    // Method to update the completion status of a reminder in the database
     public void updateReminderDoneStatus(long id, boolean done) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -87,6 +102,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         db.update(FeedReminder.FeedEntry.TABLE_NAME, values, selection, selectionArgs);
     }
 
+    // Method to delete a reminder from the database
     public void deleteReminder(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = FeedReminder.FeedEntry._ID + " = ?";
@@ -94,6 +110,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
         db.delete(FeedReminder.FeedEntry.TABLE_NAME, selection, selectionArgs);
     }
 
+    // Method to remove a reminder from the list
     public void removeReminderAt(int position) {
         reminderList.remove(position);
         notifyItemRemoved(position);
