@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             String title = cursor.getString(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_TITLE));
             String note = cursor.getString(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_NOTE));
             boolean done = cursor.getInt(cursor.getColumnIndexOrThrow(FeedReminder.FeedEntry.COLUMN_NAME_DONE)) == 1;
-            reminderList.add(new Reminder(id, title, note, done));
+            reminderList.add(new Reminder(id, title, note, done, this));
         }
         cursor.close();
         reminderAdapter.notifyDataSetChanged();

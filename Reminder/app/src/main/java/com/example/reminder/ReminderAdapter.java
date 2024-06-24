@@ -98,7 +98,7 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.Remind
     }
 
 
-    public void deleteReminder(long id) {
+    void deleteReminder(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         String selection = FeedReminder.FeedEntry._ID + " = ?";
         String[] selectionArgs = { String.valueOf(id) };
