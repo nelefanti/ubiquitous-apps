@@ -47,7 +47,7 @@ public class Reminder {
     public void triggerHapticFeedback() {
         Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
         if (vibrator != null && vibrator.hasVibrator()) {
-            vibrator.vibrate(10);
+            vibrator.vibrate(1);
         }
     }
 }

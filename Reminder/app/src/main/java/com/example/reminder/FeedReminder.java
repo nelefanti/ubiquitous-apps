@@ -3,8 +3,6 @@ package com.example.reminder;
 import android.provider.BaseColumns;
 
 public final class FeedReminder {
-    // Um zu verhindern, dass jemand versehentlich die Klasse instanziiert,
-    // machen wir den Konstruktor privat.
     private FeedReminder() {}
 
     /* Innere Klasse, die den Tabelleninhalt definiert */
